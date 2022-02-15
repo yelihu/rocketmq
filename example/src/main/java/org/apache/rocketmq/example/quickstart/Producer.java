@@ -20,7 +20,10 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.example.MqConstants;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
+
+import static org.apache.rocketmq.example.MqConstants.PRODUCER_GROUP;
 
 /**
  * This class demonstrates how to send messages to brokers using provided {@link DefaultMQProducer}.
@@ -31,18 +34,16 @@ public class Producer {
         /*
          * Instantiate with a producer group name.
          */
-        DefaultMQProducer producer = new DefaultMQProducer("please_rename_unique_group_name");
+        DefaultMQProducer producer = new DefaultMQProducer(PRODUCER_GROUP);
+        //这里必须要指定nameserver，源码里面没有给出，在下面的代码中给出，或者在参数里面给NAMESRV_ADDR来指定
+
+        producer.setNamesrvAddr(MqConstants.NAME_SRV_ADDR);
 
         /*
-         * Specify name server addresses.
-         * <p/>
-         *
+         * Specify name server addresses.这里必须要指定nameserver
          * Alternatively, you may specify name server addresses via exporting environmental variable: NAMESRV_ADDR
-         * <pre>
-         * {@code
-         * producer.setNamesrvAddr("name-server1-ip:9876;name-server2-ip:9876");
-         * }
-         * </pre>
+         * 或者在参数里面给NAMESRV_ADDR来指定
+         * producer.setNamesrvAddr("name-server1-ip:9876;name-server2-ip:9876"); 指定多个nameserver的话，；来分开即可
          */
 
         /*
@@ -56,10 +57,8 @@ public class Producer {
                 /*
                  * Create a message instance, specifying topic, tag and message body.
                  */
-                Message msg = new Message("TopicTest" /* Topic */,
-                    "TagA" /* Tag */,
-                    ("Hello RocketMQ " + i).getBytes(RemotingHelper.DEFAULT_CHARSET) /* Message body */
-                );
+                Message msg = new Message("TopicTest" /* Topic */, "TagA" /* Tag */,
+                    ("Hello RocketMQ " + i).getBytes(RemotingHelper.DEFAULT_CHARSET) /* Message body */);
 
                 /*
                  * Call send message to deliver message to one of brokers.
