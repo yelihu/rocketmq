@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.example.quickstart;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -35,21 +36,11 @@ public class Consumer {
     public static void main(String[] args) throws InterruptedException, MQClientException {
 
         /*
-         * Instantiate with specified consumer group name.
+         * 指定consumer group用来实例化一个消费者
          */
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(MqConstants.CONSUMER_GROUP);
+        /* 必须要自己指定NameServer */
         consumer.setNamesrvAddr(MqConstants.NAME_SRV_ADDR);
-        /*
-         * Specify name server addresses.
-         * <p/>
-         *
-         * Alternatively, you may specify name server addresses via exporting environmental variable: NAMESRV_ADDR
-         * <pre>
-         * {@code
-         * consumer.setNamesrvAddr("name-server1-ip:9876;name-server2-ip:9876");
-         * }
-         * </pre>
-         */
 
         /*
          * Specify where to start in case the specified consumer group is a brand new one.
@@ -70,6 +61,7 @@ public class Consumer {
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
                 System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread()
                     .getName(), msgs);
+                msgs.forEach(msg -> {System.out.println(new String(msg.getBody(), StandardCharsets.UTF_8));});
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });
